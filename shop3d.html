@@ -4,53 +4,112 @@
     <meta charset="UTF-8">
     <title>Shop In 3D – Bán hàng</title>
     <style>
-        body{margin:0;font-family:Arial;background:#f4f4f4}
-        header{background:#111;color:#fff;padding:15px;text-align:center}
-        .container{max-width:1100px;margin:auto;padding:20px}
-        .product{display:grid;grid-template-columns:1fr 1fr;gap:20px;background:#fff;padding:20px;border-radius:10px}
-        .product img{width:100%;border-radius:10px}
-        .price{color:#e74c3c;font-size:24px;font-weight:bold}
-        select,input,button{padding:10px;margin-top:10px;width:100%}
-        button{background:#27ae60;color:#fff;border:none;border-radius:6px;font-size:16px;cursor:pointer}
-        button:hover{background:#219150}
-        .cart{margin-top:30px;background:#fff;padding:20px;border-radius:10px}
-        .cart-item{display:flex;justify-content:space-between;margin:8px 0}
-        .total{font-weight:bold;font-size:18px;margin-top:10px}
+        body{
+            margin:0;
+            font-family:Arial;
+            background:#f4f4f4
+        }
+
+        header{
+            background:#111;
+            color:#fff;
+            padding:15px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:15px
+        }
+
+        .logo{
+            height:60px;
+            width:60px;
+            border-radius:50%;
+            object-fit:cover;
+            border:2px solid #fff
+        }
+
+        .container{
+            max-width:1100px;
+            margin:auto;
+            padding:20px
+        }
+
+        .products{
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+            gap:20px
+        }
+
+        .product{
+            background:#fff;
+            padding:20px;
+            border-radius:10px
+        }
+
+        .product img{
+            width:100%;
+            border-radius:10px
+        }
+
+        .price{
+            color:#e74c3c;
+            font-size:22px;
+            font-weight:bold;
+            margin-top:10px
+        }
+
+        select,input,button{
+            padding:10px;
+            margin-top:8px;
+            width:100%
+        }
+
+        button{
+            background:#27ae60;
+            color:#fff;
+            border:none;
+            border-radius:6px;
+            font-size:16px;
+            cursor:pointer
+        }
+
+        button:hover{
+            background:#219150
+        }
+
+        .cart{
+            margin-top:30px;
+            background:#fff;
+            padding:20px;
+            border-radius:10px
+        }
+
+        .cart-item{
+            display:flex;
+            justify-content:space-between;
+            margin:8px 0
+        }
+
+        .total{
+            font-weight:bold;
+            font-size:18px;
+            margin-top:10px
+        }
     </style>
 </head>
+
 <body>
+
 <header>
-    <h1>SHOP IN 3D</h1>
-    <p>Đặt in mô hình – chọn size – chọn vật liệu</p>
+    <img src="logo.jpg" class="logo">
+    <div>
+        <h1>SHOP IN 3D</h1>
+        <p>Đặt in mô hình – chọn size – chọn vật liệu</p>
+    </div>
 </header>
 
 <div class="container">
-    <div class="product">
-        <img src="kiem.jpg" alt="Kiếm 3D">
-        <div>
-            <h2>Mô hình kiếm</h2>
-            <p>In 3D theo yêu cầu, hoàn thiện thủ công</p>
-
-            <label>Kích thước</label>
-            <select id="size" onchange="updatePrice()">
-                <option value="1">30 cm</option>
-                <option value="1.5">50 cm</option>
-                <option value="2">80 cm</option>
-            </select>
-
-            <label>Vật liệu</label>
-            <select id="material" onchange="updatePrice()">
-                <option value="1">PLA</option>
-                <option value="1.4">Resin</option>
-            </select>
-
-            <label>Số lượng</label>
-            <input type="number" id="qty" value="1" min="1" onchange="updatePrice()">
-
-            <div class="price" id="price"></div>
-            <button onclick="addToCart()">Thêm vào giỏ</button>
-        </div>
-    </div>
+    <div class="products" id="products"></div>
 
     <div class="cart">
         <h2>Giỏ hàng</h2>
@@ -61,44 +120,91 @@
 </div>
 
 <script>
-    const BASE_PRICE = 70000;
+    const productsData = [
+        {id:1,name:'Mô hình kiếm',img:'kiem.jpg',base:70000},
+        {id:2,name:'Súng trang trí',img:'gun.jpg',base:90000},
+        {id:3,name:'Figure anime',img:'figure.jpg',base:120000},
+        {id:4,name:'Mô hình xe F1',img:'xe.jpg',base:150000},
+        {id:5,name:'Mô hình xe BMW M4',img:'bmwm4.jpg',base:70000},
+        {id:6,name:'Mô hình "bóng" Raichu Pokémon',img:'raichupoke.jpg',base:70000}
+    ];
+
     let cart = [];
 
-    function updatePrice(){
-        const size = document.getElementById('size').value;
-        const material = document.getElementById('material').value;
-        const qty = document.getElementById('qty').value;
-        const price = BASE_PRICE * size * material * qty;
-        document.getElementById('price').innerText = price.toLocaleString() + ' đ';
+    function renderProducts(){
+        const div = document.getElementById('products');
+        div.innerHTML = '';
+        productsData.forEach(p=>{
+            div.innerHTML += `
+            <div class="product">
+                <img src="${p.img}">
+                <h2>${p.name}</h2>
+
+                <label>Kích thước</label>
+                <select id="size-${p.id}" onchange="updatePrice(${p.id})">
+                    <option value="1">30 cm</option>
+                    <option value="1.5">50 cm</option>
+                    <option value="2">80 cm</option>
+                </select>
+
+                <label>Vật liệu</label>
+                <select id="material-${p.id}" onchange="updatePrice(${p.id})">
+                    <option value="1">PLA</option>
+                    <option value="1.4">Resin</option>
+                </select>
+
+                <label>Số lượng</label>
+                <input type="number" id="qty-${p.id}" value="1" min="1" onchange="updatePrice(${p.id})">
+
+                <div class="price" id="price-${p.id}"></div>
+                <button onclick="addToCart(${p.id})">Thêm vào giỏ</button>
+            </div>`;
+            updatePrice(p.id);
+        });
     }
 
-    function addToCart(){
-        const sizeText = document.getElementById('size').selectedOptions[0].text;
-        const materialText = document.getElementById('material').selectedOptions[0].text;
-        const qty = document.getElementById('qty').value;
-        const priceText = document.getElementById('price').innerText;
-        cart.push({sizeText,materialText,qty,priceText});
+    function updatePrice(id){
+        const p = productsData.find(x=>x.id===id);
+        const size = document.getElementById(`size-${id}`).value;
+        const material = document.getElementById(`material-${id}`).value;
+        const qty = document.getElementById(`qty-${id}`).value;
+        const price = p.base * size * material * qty;
+        document.getElementById(`price-${id}`).innerText =
+            price.toLocaleString() + ' đ';
+    }
+
+    function addToCart(id){
+        const p = productsData.find(x=>x.id===id);
+        const size = document.getElementById(`size-${id}`).selectedOptions[0].text;
+        const material = document.getElementById(`material-${id}`).selectedOptions[0].text;
+        const qty = document.getElementById(`qty-${id}`).value;
+        const price = document.getElementById(`price-${id}`).innerText;
+        cart.push({name:p.name,size,material,qty,price});
         renderCart();
     }
 
     function renderCart(){
         const div = document.getElementById('cartItems');
-        div.innerHTML = '';
-        let total = 0;
-        cart.forEach(item=>{
-            const p = parseInt(item.priceText.replace(/\D/g,''));
-            total += p;
-            div.innerHTML += `<div class='cart-item'><span>${item.sizeText} – ${item.materialText} x${item.qty}</span><span>${item.priceText}</span></div>`;
+        div.innerHTML='';
+        let total=0;
+        cart.forEach(i=>{
+            const p = parseInt(i.price.replace(/\D/g,''));
+            total+=p;
+            div.innerHTML+=`
+            <div class="cart-item">
+                <span>${i.name} – ${i.size} – ${i.material} x${i.qty}</span>
+                <span>${i.price}</span>
+            </div>`;
         });
         document.getElementById('total').innerText = total.toLocaleString();
     }
 
     function orderZalo(){
-        const msg = encodeURIComponent('Tôi muốn đặt in mô hình kiếm. Tổng tiền: ' + document.getElementById('total').innerText + ' đ');
         window.open('https://zalo.me','_blank');
     }
 
-    updatePrice();
+    renderProducts();
 </script>
+
 </body>
 </html>
